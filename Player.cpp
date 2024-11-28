@@ -6,8 +6,8 @@ Player::Player(GameMechs* thisGMRef)
     myDir = STOP;
 
     // more actions to be included
-    playerPos.pos-> x = 10;
-    playerPos.pos->y = 5;
+    playerPos.pos-> x = (mainGameMechsRef->getBoardSizeX())/2;
+    playerPos.pos->y = (mainGameMechsRef->getBoardSizeY())/2;
     playerPos.symbol = '@';
 }
 
@@ -66,29 +66,29 @@ void Player::movePlayer()
     switch(myDir)
     {
         case LEFT:
-            playerPos.pos->x -= 1;
+            playerPos.pos->x--;
             if(playerPos.pos->x == 0)
             {
-                playerPos.pos->x = 18;
+                playerPos.pos->x = 28;
             }
             break;
         case RIGHT:
-            playerPos.pos->x += 1;
-            if(playerPos.pos->x == 19)
+            playerPos.pos->x++;
+            if(playerPos.pos->x == 29)
             {
                 playerPos.pos->x = 1;
             }
             break;
         case UP:
-            playerPos.pos->y -= 1;
+            playerPos.pos->y--;
             if(playerPos.pos->y == 0)
             {
-                playerPos.pos->y = 8;
+                playerPos.pos->y = 13;
             }
             break;
         case DOWN:
-            playerPos.pos->y += 1;
-            if(playerPos.pos->y == 9)
+            playerPos.pos->y++;
+            if(playerPos.pos->y == 14)
             {
                 playerPos.pos->y = 1;
             }

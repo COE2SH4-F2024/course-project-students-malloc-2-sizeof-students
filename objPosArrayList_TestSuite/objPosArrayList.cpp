@@ -5,7 +5,8 @@
 
 objPosArrayList::objPosArrayList()
 {
-    
+    arrayCapacity = 200;
+    listSize = 0;
 }
 
 objPosArrayList::~objPosArrayList()
