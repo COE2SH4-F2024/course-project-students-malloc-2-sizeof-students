@@ -1,4 +1,8 @@
 #include "GameMechs.h"
+#include "MacUILib.h"
+#include "time.h"
+
+GameMechs *myGM;
 
 GameMechs::GameMechs()
 {
@@ -12,6 +16,8 @@ GameMechs::GameMechs()
     exitFlag = false;
     loseFlag = false;
     input = '\0';
+
+    food.setObjPos(-10, -10, 'o');
 }
 
 GameMechs::GameMechs(int boardX, int boardY)
@@ -26,6 +32,8 @@ GameMechs::GameMechs(int boardX, int boardY)
     loseFlag = false;
     score = 0;
     input = '\0';
+
+    food.setObjPos(-10, -10, 'o');
 }
 
 // do you need a destructor?
@@ -57,7 +65,7 @@ int GameMechs::getScore() const
 
 void GameMechs::incrementScore()
 {
-    ++score;
+    score++;
 }
 
 int GameMechs::getBoardSizeX() const
@@ -92,27 +100,48 @@ void GameMechs::clearInput()
 }
 
 // More methods should be added here
+
+void GameMechs::collectAsynchInput()
+{
+    if(MacUILib_hasChar())
+    {
+        input = MacUILib_getChar();
+    }
+
+    if(input == ' ')
+    {
+        exitFlag = true;
+    }
+}
+
 // void GameMechs::generateFood(const objPosArrayList& snakeBody) {
+    
+//     srand(time(NULL));
 //     bool valid = false;
+//     int x,y;
 
 //     while (!valid) {
-//         int x = rand() % boardSizeX;
-//         int y = rand() % boardSizeY;
+//         x = rand() % (boardSizeX - 2) + 1;
+//         y = rand() % (boardSizeY - 2) + 1;
 
 //         valid = true;  // Assume the position is valid until proven otherwise
 
 //         // Check if food overlaps with any part of the snake's body
-//         for (int i = 0; i < snakeBody.getSize(); ++i) {
-//             if (snakeBody.getElement(i).getX() == x && snakeBody.getElement(i).getY() == y) {
+//         for (int i = 0; i < snakeBody.getSize(); i++) 
+//         {
+//             objPos segment = snakeBody.getElement(i);
+//             if (segment.pos->x == x && segment.pos->y == y) 
+//             {
 //                 valid = false; // If overlap, find a new position
 //                 break;
 //             }
 //         }
-
-//         if (valid) {
-//             food.setX(x);
-//             food.setY(y);
-//             food.setSymbol('@'); // Set food symbol to '@'
-//         }
 //     }
+
+//     food.setObjPos(x, y, '*'); //Food symbol
 // }
+
+objPos GameMechs::getFoodPos() const
+{
+    return food;
+}

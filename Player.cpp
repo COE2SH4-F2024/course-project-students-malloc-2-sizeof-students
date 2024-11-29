@@ -6,15 +6,22 @@ Player::Player(GameMechs* thisGMRef)
     myDir = STOP;
 
     // more actions to be included
-    playerPos.pos-> x = (mainGameMechsRef->getBoardSizeX())/2;
-    playerPos.pos->y = (mainGameMechsRef->getBoardSizeY())/2;
-    playerPos.symbol = '@';
+
+    playerPosList = new objPosArrayList();
+    objPos initialPos((mainGameMechsRef->getBoardSizeX())/2, (mainGameMechsRef->getBoardSizeY())/2, '@');
+    
+    playerPos.pos-> x = initialPos.pos->x;
+    playerPos.pos->y = initialPos.pos->y;
+    playerPos.symbol = initialPos.symbol;
+    
+    playerPosList->insertHead(initialPos);
 }
 
 
 Player::~Player()
 {
     // delete any heap members here
+    delete[] playerPosList;
 }
 
 objPos Player::getPlayerPos() const
@@ -26,7 +33,9 @@ objPos Player::getPlayerPos() const
 void Player::updatePlayerDir()
 {
         // PPA3 input processing logic
-        switch(mainGameMechsRef->getInput())
+        char input = mainGameMechsRef->getInput();
+
+        switch(input)
         {                      
             case 'w':
                 if(myDir != DOWN)
@@ -69,12 +78,12 @@ void Player::movePlayer()
             playerPos.pos->x--;
             if(playerPos.pos->x == 0)
             {
-                playerPos.pos->x = 28;
+                playerPos.pos->x = mainGameMechsRef->getBoardSizeX() - 2;
             }
             break;
         case RIGHT:
             playerPos.pos->x++;
-            if(playerPos.pos->x == 29)
+            if(playerPos.pos->x == mainGameMechsRef->getBoardSizeX() - 1)
             {
                 playerPos.pos->x = 1;
             }
@@ -83,12 +92,12 @@ void Player::movePlayer()
             playerPos.pos->y--;
             if(playerPos.pos->y == 0)
             {
-                playerPos.pos->y = 13;
+                playerPos.pos->y = mainGameMechsRef->getBoardSizeY() - 2;
             }
             break;
         case DOWN:
             playerPos.pos->y++;
-            if(playerPos.pos->y == 14)
+            if(playerPos.pos->y == mainGameMechsRef->getBoardSizeY() - 1)
             {
                 playerPos.pos->y = 1;
             }
@@ -99,3 +108,11 @@ void Player::movePlayer()
 }
 
 // More methods to be added
+// void Player::checkFoodConsumption()
+// {
+//     if(playerPos.pos->x == mainGameMechsRef->getFoodPos().pos->x && playerPos.pos->y == mainGameMechsRef->getFoodPos().pos->y)
+//     {
+//         mainGameMechsRef->incrementScore();
+//         mainGameMechsRef->generateFood();
+//     }
+// }

@@ -48,19 +48,11 @@ void Initialize(void)
 
 void GetInput(void)
 {
-    if(MacUILib_hasChar())
-    {
-        mainGameMechsRef->setInput(MacUILib_getChar());
-    }
-    
+    mainGameMechsRef->collectAsynchInput();
 }
 
 void RunLogic(void)
 {
-    if(mainGameMechsRef->getInput() == ' ')
-    {
-        mainGameMechsRef->setExitTrue();
-    }
     myPlayer->updatePlayerDir();
     myPlayer->movePlayer();
     mainGameMechsRef->clearInput();
@@ -70,13 +62,15 @@ void DrawScreen(void)
 {
     MacUILib_clearScreen();
     
-    // objPos gameboard;
+    int boardX = mainGameMechsRef->getBoardSizeX();
+    int boardY = mainGameMechsRef->getBoardSizeY();
     objPos player_pos = myPlayer->getPlayerPos();
+    objPos foodPos = mainGameMechsRef->getFoodPos();
     
     int i,j;
-    for(i = 0; i < mainGameMechsRef->getBoardSizeY(); i++)
+    for(i = 0; i < boardY; i++)
     {
-        for(j = 0; j < mainGameMechsRef->getBoardSizeX(); j++)
+        for(j = 0; j < boardX; j++)
         {
             if(i == 0 || i == 14 || j == 0 || j == 29)
             {
@@ -88,6 +82,10 @@ void DrawScreen(void)
             else if(player_pos.pos->x == j && player_pos.pos->y == i)
             {
                 MacUILib_printf("%c", player_pos.symbol);
+            }
+            else if(foodPos.pos->x == j && foodPos.pos->y == i)
+            {
+                MacUILib_printf("%c", foodPos.symbol);
             }
             else
             {

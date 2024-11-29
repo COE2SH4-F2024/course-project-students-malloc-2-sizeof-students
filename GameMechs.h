@@ -41,8 +41,11 @@ class GameMechs
         
         int getScore() const;
         void incrementScore();
+        void generateFood(const objPosArrayList& snakeBody);
+        objPos getFoodPos() const;
         
         // More methods should be added here
+        void collectAsynchInput();
 };
 
 #endif
