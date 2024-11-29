@@ -23,6 +23,7 @@ class Player
         objPos getPlayerPos() const; // Upgrade this in iteration 3.       
         void updatePlayerDir();
         void movePlayer();
+        void checkFoodConsumption();
 
         // More methods to be added here
 
@@ -32,6 +33,7 @@ class Player
 
         // Need a reference to the Main Game Mechanisms
         GameMechs* mainGameMechsRef;
+        objPosArrayList* playerPosList; // dynamically allocated array list for snake body
 };
 
 #endif

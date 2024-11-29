@@ -11,9 +11,6 @@ using namespace std;
 GameMechs *mainGameMechsRef;
 Player *myPlayer;
 
-GameMechs *myGM;
-
-
 void Initialize(void);
 void GetInput(void);
 void RunLogic(void);
@@ -28,7 +25,7 @@ int main(void)
 
     Initialize();
 
-    while(myGM ->getExitFlagStatus() == false)  
+    while(mainGameMechsRef->getExitFlagStatus() == false)  
     {
         GetInput();
         RunLogic();
@@ -46,28 +43,20 @@ void Initialize(void)
     MacUILib_init();
     MacUILib_clearScreen();
 
-    myPlayer = new Player(myGM);
-    myGM = new GameMechs();
-
-
+    mainGameMechsRef = new GameMechs();
+    myPlayer = new Player(mainGameMechsRef);
 }
 
 void GetInput(void)
 {
-  
+    mainGameMechsRef->collectAsynchInput();
 }
 
 void RunLogic(void)
 {
     myPlayer->updatePlayerDir();
     myPlayer->movePlayer();
-
-    // Exit flag handling
-    if (myGM->getInput() == ' ')
-    {
-        myGM->setExitTrue();
-    }
-
+    mainGameMechsRef->clearInput();
 }
 
 void DrawScreen(void)
@@ -77,39 +66,44 @@ void DrawScreen(void)
     // MacUILib_printf("Player[x,y] = [%d, %d], %c",
     //                 playerPos.pos->x, playerPos.pos->y,  /// come back to this
     
-    objPos gameboard;
+    int boardX = mainGameMechsRef->getBoardSizeX();
+    int boardY = mainGameMechsRef->getBoardSizeY();
     objPos player_pos = myPlayer->getPlayerPos();
-    objPos foodPos = myGM->getFoodPos();/// not a member yet..?
-
+    objPos foodPos = mainGameMechsRef->getFoodPos();
+    
     int i,j;
-    for(i = 0; i < myGM->getBoardSizeY(); i++)
+    for(i = 0; i < boardY; i++)
     {
-        for(j = 0; j < myGM->getBoardSizeX(); j++)
+        for(j = 0; j < boardX; j++)
         {
-            if(i == 0 || i == myGM->getBoardSizeY() - 1 || j == 0 || j == myGM->getBoardSizeX()-1)
+            if(i == 0 || i == 14 || j == 0 || j == 29)
             {
-                gameboard.symbol = '#';
-                gameboard.pos->x = j;
-                gameboard.pos->y = i;
-                MacUILib_printf("%c", gameboard.symbol);
+                // gameboard.symbol = '#';
+                // gameboard.pos->x = j;
+                // gameboard.pos->y = i;
+                MacUILib_printf("#");
             }
             else if(player_pos.pos->x == j && player_pos.pos->y == i)
             {
                 MacUILib_printf("%c", player_pos.symbol);
             }
+            else if(foodPos.pos->x == j && foodPos.pos->y == i)
+            {
+                MacUILib_printf("%c", foodPos.symbol);
+            }
             else
             {
-                gameboard.symbol = ' ';
-                gameboard.pos->x = j;
-                gameboard.pos->y = i;
-                MacUILib_printf("%c", gameboard.symbol);
+                // gameboard.symbol = ' ';
+                // gameboard.pos->x = j;
+                // gameboard.pos->y = i;
+                MacUILib_printf(" ");
             }
         }
 
         MacUILib_printf("\n");
     }  
 
-
+    MacUILib_printf("Player[x,y] = [%d, %d], %c", player_pos.pos->x, player_pos.pos->y, player_pos.symbol);
 }
 
 void LoopDelay(void)
@@ -122,8 +116,20 @@ void CleanUp(void)
 {
     MacUILib_clearScreen();  
 
-    delete myPlayer;  
-    delete myGM;
+    delete myPlayer;
+    
+    if(mainGameMechsRef->getLoseFlagStatus())
+    {
+        MacUILib_printf("You lost the game.\n");
+    }
+    else
+    {
+        MacUILib_printf("You won!\n");
+    }
+
+    MacUILib_printf("Score: %d", mainGameMechsRef->getScore());
+
+    delete mainGameMechsRef;
 
     MacUILib_uninit();
 }
