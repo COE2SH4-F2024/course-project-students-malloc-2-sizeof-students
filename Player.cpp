@@ -1,4 +1,6 @@
 #include "Player.h"
+#include "objPos.h"
+
 
 Player::Player(GameMechs* thisGMRef)
 {
@@ -6,9 +8,13 @@ Player::Player(GameMechs* thisGMRef)
     myDir = STOP;
 
     // more actions to be included
-    playerPos.pos-> x = 10;
-    playerPos.pos->y = 5;
-    playerPos.symbol = '@';
+    // playerPos.pos-> x = mainGameMechsRef ->getBoardSizeX() / 2;
+    // playerPos.pos->y = mainGameMechsRef ->getBoardSizeY() / 2;;
+    // playerPos.symbol = '@';
+
+    playerPosList = new objPosArrayList();
+    objPos initialPos(mainGameMechsRef->getBoardSizeX() / 2, mainGameMechsRef->getBoardSizeY() / 2, '@');
+    playerPosList->insertHead(initialPos);
 }
 
 
@@ -25,6 +31,8 @@ objPos Player::getPlayerPos() const
 
 void Player::updatePlayerDir()
 {
+    // where do i get input from? 
+    char input = mainGameMechsRef -> getInput();
         // PPA3 input processing logic
         switch(mainGameMechsRef->getInput())
         {                      
@@ -95,6 +103,17 @@ void Player::movePlayer()
             break;
         default:
             break;
+    }
+    // Check for food consumption
+    if (playerPos.pos->x == mainGameMechsRef->getFoodPos().pos->x && playerPos.pos->y == mainGameMechsRef->getFoodPos().pos->y)
+    {
+        mainGameMechsRef->incrementScore();            // Increment score
+        Player player(mainGameMechsRef); //declared
+        //mainGameMechsRef->generateFood(objPos()); // WHYYYYYYYYYYY
+        mainGameMechsRef->generateFood(player.getPlayerPos());
+
+
+
     }
 }
 

@@ -1,21 +1,35 @@
 #include "GameMechs.h"
+#include "MacUILib.h"
+#include "time.h"
+GameMechs *myGM;
 
 GameMechs::GameMechs()
-    : input('\0'), exitFlag(false), loseFlag(false), score(0), boardSizeX(30), boardSizeY(15), food() {
-    // Default constructor: initialize all members
-    // No need for additional code in the constructor body unless needed
+{
+    input= 0;
+    exitFlag = false;
+    loseFlag = false;
+    score = 0;
+
+    boardSizeX = 30;
+    boardSizeY = 15;
+
 }
 
 GameMechs::GameMechs(int boardX, int boardY)
-    : input('\0'), exitFlag(false), loseFlag(false), score(0), boardSizeX(boardX), boardSizeY(boardY), food() {
-    // Parameterized constructor: initialize with custom board size
-    // No need for additional code in the constructor body unless needed
+{
+    input= 0;
+    exitFlag = false;
+    loseFlag = false;
+    score = 0;
+
+    boardSizeX = boardX;
+    boardSizeY = boardY;
 }
 
 // do you need a destructor?
 GameMechs::~GameMechs()
 {
-    // no dynamic memory to clean up
+    // no dynamic memory to clean up right now...
 }
 
 bool GameMechs::getExitFlagStatus() const
@@ -29,8 +43,13 @@ bool GameMechs::getLoseFlagStatus() const
 }
     
 
-char GameMechs::getInput() const
+char GameMechs::getInput() 
 {
+    if(MacUILib_hasChar()){
+        input = MacUILib_getChar();
+        myGM -> setInput (input);
+
+    }
     return input;
 }
 
@@ -41,7 +60,7 @@ int GameMechs::getScore() const
 
 void GameMechs::incrementScore()
 {
-    ++score;
+    score++;
 }
 
 int GameMechs::getBoardSizeX() const
@@ -76,27 +95,27 @@ void GameMechs::clearInput()
 }
 
 // More methods should be added here
-void GameMechs::generateFood(const objPosArrayList& snakeBody) {
+void GameMechs::generateFood(const objPos& blockOff) {
     bool valid = false;
 
     while (!valid) {
+        // Generate random coordinates for the food
         int x = rand() % boardSizeX;
         int y = rand() % boardSizeY;
 
-        valid = true;  // Assume the position is valid until proven otherwise
-
-        // Check if food overlaps with any part of the snake's body
-        for (int i = 0; i < snakeBody.getSize(); ++i) {
-            if (snakeBody.getElement(i).getX() == x && snakeBody.getElement(i).getY() == y) {
-                valid = false; // If overlap, find a new position
-                break;
-            }
-        }
+        // Check if the generated position is valid
+        valid = !(x == blockOff.pos->x && y == blockOff.pos->y);
 
         if (valid) {
-            food.setX(x);
-            food.setY(y);
-            food.setSymbol('@'); // Set food symbol to '@'
+            // Set the food position and symbol
+            food.setObjPos(x, y, '@'); // '@' is the food symbol
         }
     }
 }
+objPos GameMechs::getFoodPos() const {
+    return food;
+}
+
+
+
+

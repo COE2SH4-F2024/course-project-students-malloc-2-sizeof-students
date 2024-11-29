@@ -1,8 +1,9 @@
 #include <iostream>
 #include "MacUILib.h"
 #include "objPos.h"
-#include "Player.h"
 
+#include "Player.h"
+#include "GameMechs.h"
 using namespace std;
 
 #define DELAY_CONST 100000
@@ -10,7 +11,8 @@ using namespace std;
 GameMechs *mainGameMechsRef;
 Player *myPlayer;
 
-bool exitFlag;
+GameMechs *myGM;
+
 
 void Initialize(void);
 void GetInput(void);
@@ -26,7 +28,7 @@ int main(void)
 
     Initialize();
 
-    while(exitFlag == false)  
+    while(myGM ->getExitFlagStatus() == false)  
     {
         GetInput();
         RunLogic();
@@ -44,9 +46,10 @@ void Initialize(void)
     MacUILib_init();
     MacUILib_clearScreen();
 
-    myPlayer = new Player(mainGameMechsRef);
+    myPlayer = new Player(myGM);
+    myGM = new GameMechs();
 
-    exitFlag = false;
+
 }
 
 void GetInput(void)
@@ -58,21 +61,32 @@ void RunLogic(void)
 {
     myPlayer->updatePlayerDir();
     myPlayer->movePlayer();
+
+    // Exit flag handling
+    if (myGM->getInput() == ' ')
+    {
+        myGM->setExitTrue();
+    }
+
 }
 
 void DrawScreen(void)
 {
     MacUILib_clearScreen();
+    // objPos playerPos = myPlayer->getPlayerPos();
+    // MacUILib_printf("Player[x,y] = [%d, %d], %c",
+    //                 playerPos.pos->x, playerPos.pos->y,  /// come back to this
     
     objPos gameboard;
     objPos player_pos = myPlayer->getPlayerPos();
-    
+    objPos foodPos = myGM->getFoodPos();/// not a member yet..?
+
     int i,j;
-    for(i = 0; i < 10; i++)
+    for(i = 0; i < myGM->getBoardSizeY(); i++)
     {
-        for(j = 0; j < 20; j++)
+        for(j = 0; j < myGM->getBoardSizeX(); j++)
         {
-            if(i == 0 || i == 9 || j == 0 || j == 19)
+            if(i == 0 || i == myGM->getBoardSizeY() - 1 || j == 0 || j == myGM->getBoardSizeX()-1)
             {
                 gameboard.symbol = '#';
                 gameboard.pos->x = j;
@@ -109,6 +123,7 @@ void CleanUp(void)
     MacUILib_clearScreen();  
 
     delete myPlayer;  
+    delete myGM;
 
     MacUILib_uninit();
 }
