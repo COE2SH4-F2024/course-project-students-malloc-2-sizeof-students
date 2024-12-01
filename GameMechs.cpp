@@ -17,7 +17,7 @@ GameMechs::GameMechs()
     loseFlag = false;
     input = '\0';
 
-    food.setObjPos(-10, -10, 'o');
+    //food.setObjPos(-10, -10, 'o');
 }
 
 GameMechs::GameMechs(int boardX, int boardY)
@@ -33,7 +33,7 @@ GameMechs::GameMechs(int boardX, int boardY)
     score = 0;
     input = '\0';
 
-    food.setObjPos(-10, -10, 'o');
+    //food.setObjPos(-10, -10, 'o');
 }
 
 // do you need a destructor?
@@ -55,11 +55,6 @@ bool GameMechs::getLoseFlagStatus() const
 
 char GameMechs::getInput() 
 {
-    if(MacUILib_hasChar()){
-        input = MacUILib_getChar();
-        myGM -> setInput (input);
-
-    }
     return input;
 }
 
@@ -68,9 +63,9 @@ int GameMechs::getScore() const
     return score; 
 }
 
-void GameMechs::incrementScore()
+void GameMechs::incrementScore(int val)
 {
-    score++;
+    score += val;
 }
 
 int GameMechs::getBoardSizeX() const
@@ -105,31 +100,6 @@ void GameMechs::clearInput()
 }
 
 // More methods should be added here
-void GameMechs::generateFood(const objPos& blockOff) {
-    bool valid = false;
-
-    while (!valid) {
-        // Generate random coordinates for the food
-        int x = rand() % boardSizeX;
-        int y = rand() % boardSizeY;
-
-        // Check if the generated position is valid
-        valid = !(x == blockOff.pos->x && y == blockOff.pos->y);
-
-        if (valid) {
-            // Set the food position and symbol
-            food.setObjPos(x, y, '@'); // '@' is the food symbol
-        }
-    }
-}
-objPos GameMechs::getFoodPos() const {
-    return food;
-}
-
-
-
-
-
 
 void GameMechs::collectAsynchInput()
 {
@@ -142,36 +112,5 @@ void GameMechs::collectAsynchInput()
     {
         exitFlag = true;
     }
-}
 
-// void GameMechs::generateFood(const objPosArrayList& snakeBody) {
-    
-//     srand(time(NULL));
-//     bool valid = false;
-//     int x,y;
-
-//     while (!valid) {
-//         x = rand() % (boardSizeX - 2) + 1;
-//         y = rand() % (boardSizeY - 2) + 1;
-
-//         valid = true;  // Assume the position is valid until proven otherwise
-
-//         // Check if food overlaps with any part of the snake's body
-//         for (int i = 0; i < snakeBody.getSize(); i++) 
-//         {
-//             objPos segment = snakeBody.getElement(i);
-//             if (segment.pos->x == x && segment.pos->y == y) 
-//             {
-//                 valid = false; // If overlap, find a new position
-//                 break;
-//             }
-//         }
-//     }
-
-//     food.setObjPos(x, y, '*'); //Food symbol
-// }
-
-objPos GameMechs::getFoodPos() const
-{
-    return food;
 }

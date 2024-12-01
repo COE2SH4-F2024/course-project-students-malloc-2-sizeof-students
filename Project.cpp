@@ -4,12 +4,15 @@
 
 #include "Player.h"
 #include "GameMechs.h"
+#include "Food.h"
+#include "time.h"
 using namespace std;
 
 #define DELAY_CONST 100000
 
 GameMechs *mainGameMechsRef;
 Player *myPlayer;
+Food *myFood;
 
 void Initialize(void);
 void GetInput(void);
@@ -22,8 +25,9 @@ void CleanUp(void);
 
 int main(void)
 {
-
+    printf("I am before init");
     Initialize();
+    printf("I am at init");
 
     while(mainGameMechsRef->getExitFlagStatus() == false)  
     {
@@ -43,8 +47,12 @@ void Initialize(void)
     MacUILib_init();
     MacUILib_clearScreen();
 
+    srand(time(NULL));
     mainGameMechsRef = new GameMechs();
-    myPlayer = new Player(mainGameMechsRef);
+    myFood = new Food(mainGameMechsRef);
+    myPlayer = new Player(mainGameMechsRef, myFood);
+    
+    myFood->generateFood(myPlayer->getPlayerPos()); 
 }
 
 void GetInput(void)
@@ -54,7 +62,6 @@ void GetInput(void)
 
 void RunLogic(void)
 {
-    myPlayer->updatePlayerDir();
     myPlayer->movePlayer();
     mainGameMechsRef->clearInput();
 }
@@ -62,48 +69,75 @@ void RunLogic(void)
 void DrawScreen(void)
 {
     MacUILib_clearScreen();
-    // objPos playerPos = myPlayer->getPlayerPos();
-    // MacUILib_printf("Player[x,y] = [%d, %d], %c",
-    //                 playerPos.pos->x, playerPos.pos->y,  /// come back to this
+    objPosArrayList* playerPos = myPlayer->getPlayerPos();
+    objPosArrayList* foodPos = myFood->getFoodPos();
+    int playerSize = playerPos->getSize();
+    int foodSize = myFood->getFoodPos()->getSize();
     
     int boardX = mainGameMechsRef->getBoardSizeX();
     int boardY = mainGameMechsRef->getBoardSizeY();
-    objPos player_pos = myPlayer->getPlayerPos();
-    objPos foodPos = mainGameMechsRef->getFoodPos();
+    // objPos player_pos = myPlayer->getPlayerPos()->getHeadElement(); // ALSO FIX
+    //objPos foodPos = myFood->getFoodPos()->;
+    bool playerFlag = false;
+    bool foodFlag = false;
     
     int i,j;
     for(i = 0; i < boardY; i++)
     {
         for(j = 0; j < boardX; j++)
         {
-            if(i == 0 || i == 14 || j == 0 || j == 29)
+            playerFlag = false;
+            foodFlag = false;
+            
+            for(int k = 0; k < playerSize; k++)
             {
-                // gameboard.symbol = '#';
-                // gameboard.pos->x = j;
-                // gameboard.pos->y = i;
+                if(playerPos->getElement(k).pos->x == j && playerPos->getElement(k).pos->y == i)
+                {
+                    MacUILib_printf("%c", playerPos->getElement(k).symbol);
+                    playerFlag = true;
+                    break;
+                }
+            }
+
+            if(playerFlag)
+            {
+                continue;
+            }
+
+            for(int x = 0; x < foodSize; x++)
+            {
+                if(foodPos->getElement(x).pos->x == j && foodPos->getElement(x).pos->y == i)
+                {
+                    MacUILib_printf("%c", foodPos->getElement(x).symbol);
+                    foodFlag = true;
+                    break;
+                }
+            }
+
+            if(foodFlag)
+            {
+                continue;
+            }
+
+            if(i == 0 || i == boardY - 1 || j == 0 || j == boardX - 1)
+            {
                 MacUILib_printf("#");
-            }
-            else if(player_pos.pos->x == j && player_pos.pos->y == i)
-            {
-                MacUILib_printf("%c", player_pos.symbol);
-            }
-            else if(foodPos.pos->x == j && foodPos.pos->y == i)
-            {
-                MacUILib_printf("%c", foodPos.symbol);
             }
             else
             {
-                // gameboard.symbol = ' ';
-                // gameboard.pos->x = j;
-                // gameboard.pos->y = i;
                 MacUILib_printf(" ");
             }
+
         }
 
         MacUILib_printf("\n");
     }  
 
-    MacUILib_printf("Player[x,y] = [%d, %d], %c", player_pos.pos->x, player_pos.pos->y, player_pos.symbol);
+    MacUILib_printf("\nScore: %d\n", mainGameMechsRef->getScore());
+    MacUILib_printf("Snake Size: %d\n", myPlayer->getPlayerPos()->getSize());
+    MacUILib_printf("\nThe 'o' symbol is normal food\n");
+    MacUILib_printf("The '+' symbol is GOOD: it increases your score by however long your snake is, then reduces your snake size to 1\n");
+    MacUILib_printf("The '-' symbol is BAD: it doubles the size of your snake and gives you no points\n");
 }
 
 void LoopDelay(void)
@@ -114,22 +148,22 @@ void LoopDelay(void)
 
 void CleanUp(void)
 {
-    MacUILib_clearScreen();  
-
-    delete myPlayer;
+    //MacUILib_clearScreen();  
     
     if(mainGameMechsRef->getLoseFlagStatus())
     {
-        MacUILib_printf("You lost the game.\n");
+        MacUILib_printf("\nYou lost the game :(\n");
     }
-    else
+    else if(!(mainGameMechsRef->getLoseFlagStatus()))
     {
-        MacUILib_printf("You won!\n");
+        MacUILib_printf("\nGame ended by Player.\n");
     }
 
-    MacUILib_printf("Score: %d", mainGameMechsRef->getScore());
-
-    delete mainGameMechsRef;
+    //MacUILib_printf("Score: %d", mainGameMechsRef->getScore());
 
     MacUILib_uninit();
+
+    delete myPlayer;
+    delete mainGameMechsRef;
+    delete myFood;
 }

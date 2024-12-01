@@ -110,3 +110,13 @@ objPos objPosArrayList::getElement(int index) const
     return aList[index];
 
 }
+
+void objPosArrayList::setSizeto1() // Check if it's okay that we added this!!
+{
+
+    if(listSize > 1)
+    {
+        listSize = 1;
+    }
+    
+}

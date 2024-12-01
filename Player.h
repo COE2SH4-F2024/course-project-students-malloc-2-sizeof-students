@@ -4,6 +4,7 @@
 #include "GameMechs.h"
 #include "objPos.h"
 #include "objPosArrayList.h"
+#include "Food.h"
 
 class Player
 {
@@ -17,23 +18,27 @@ class Player
     public:
         enum Dir {UP, DOWN, LEFT, RIGHT, STOP};  // This is the direction state
 
-        Player(GameMechs* thisGMRef);
+        Player(GameMechs* thisGMRef, Food* thisFoodRef);
         ~Player();
 
-        objPos getPlayerPos() const; // Upgrade this in iteration 3.       
+        objPosArrayList* getPlayerPos() const; // Upgrade this in iteration 3.       
         void updatePlayerDir();
         void movePlayer();
-        void checkFoodConsumption();
 
         // More methods to be added here
+        bool checkFoodConsumption();
+        void increasePlayerLength();
+        void checkSelfCollision();
+
 
     private:
-        objPos playerPos; // Upgrade this in iteration 3.       
+        //objPos playerPosList; // Upgrade this in iteration 3.
+        objPosArrayList* playerPosList;
         enum Dir myDir;
 
         // Need a reference to the Main Game Mechanisms
         GameMechs* mainGameMechsRef;
-        objPosArrayList* playerPosList; // dynamically allocated array list for snake body
+        Food* foodRef;
 };
 
 #endif

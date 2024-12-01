@@ -40,17 +40,8 @@ class GameMechs
         int getBoardSizeY() const;
         
         int getScore() const;
-        void incrementScore();
-<<<<<<< HEAD
-        // void generateFood (const objPosArrayList& snakeBody);
-        // int getX; 
-        // int getY;
-        // int setX; 
-        // int setY;
-=======
-        void generateFood(const objPosArrayList& snakeBody);
-        objPos getFoodPos() const;
->>>>>>> edb22dad42afaa66edfc863d9adb2ba8e3bf5625
+        void incrementScore(int val);
+        
         
         // More methods should be added here
         void collectAsynchInput();
