@@ -20,19 +20,17 @@ class GameMechs
         int boardSizeX;
         int boardSizeY;
 
-        objPos food;
-
     public:
         GameMechs();
         GameMechs(int boardX, int boardY);
-        ~GameMechs(); // is this one needed at all? Why or why not?
+        ~GameMechs(); 
         
         bool getExitFlagStatus() const; 
         void setExitTrue();
         bool getLoseFlagStatus() const;
         void setLoseFlag();
 
-        char getInput() ;
+        char getInput() const;
         void setInput(char this_input);
         void clearInput();
 
@@ -40,7 +38,7 @@ class GameMechs
         int getBoardSizeY() const;
         
         int getScore() const;
-        void incrementScore(int val);
+        void incrementScore(int val); // Changed to accept an integer, by which the score will be incremented
         
         
         // More methods should be added here

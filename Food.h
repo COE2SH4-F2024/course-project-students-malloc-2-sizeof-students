@@ -7,6 +7,7 @@
 
 using namespace std;
 
+// Custom class for food item generation 
 class Food
 {
     private:
@@ -22,7 +23,6 @@ class Food
         objPosArrayList* getFoodPos() const;
         void generateFood(const objPosArrayList* blockOffList);
         void clearFood();
-        // objPos getFoodPosElement(int index) const;
 };
 
 #endif

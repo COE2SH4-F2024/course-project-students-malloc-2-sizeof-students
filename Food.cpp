@@ -1,53 +1,30 @@
 #include "Food.h"
 #include "time.h"
 
-Food::Food(GameMechs* thisGMRef)
+Food::Food(GameMechs* thisGMRef) // Accepts reference to GameMechs class to access its methods
 {
     mainGameMechsRef = thisGMRef;
 
     boardSizeX = mainGameMechsRef->getBoardSizeX();
     boardSizeY = mainGameMechsRef->getBoardSizeY();
 
-    foodBucket = new objPosArrayList();
-
-    //food.setObjPos(-10, -10, 'o');
+    foodBucket = new objPosArrayList();  // Instantiating foodBucket on heap
 
 }
 
 Food::~Food()
 {
-    delete foodBucket;
+    delete foodBucket;  // clearing foodBucket from heap
 }
 
 void Food::generateFood(const objPosArrayList* blockOffList) {
-    // bool valid = false;
-
-    // srand(time(NULL));
-    // while (!valid) 
-    // {
-    //     // Generate random coordinates for the food
-    //     int x = rand() % boardSizeX;
-    //     int y = rand() % boardSizeY;
-    //     int listSize = blockOffList->getSize();
-
-    //     valid = true;
-
-    //     for(int i = 0; i < listSize; i++)
-    //     {
-    //         if(x == blockOffList->getElement(i).pos->x || y == blockOffList->getElement(i).pos->y || x == 0 || y == 0 || x == (boardSizeX - 1) || y == (boardSizeY - 1)) 
-    //         {
-    //             valid = false;
-    //         }
-    //     }
-
-    //     food.setObjPos(x, y, 'o'); // 'o' is the food symbol
-    // }
 
     clearFood();
 
     int x_vector[boardSizeX]; // bit vector for x-coordinates
     int y_vector[boardSizeY]; // bit vector for y-coordinates
 
+    // Initializing the elements to 0
     int i;
     for(i = 0; i < boardSizeX; i++)
     {x_vector[i] = 0;}
@@ -55,9 +32,9 @@ void Food::generateFood(const objPosArrayList* blockOffList) {
     for(i = 0; i < boardSizeY; i++)
     {y_vector[i] = 0;}
 
-    objPos random;
+    objPos random; // new objPos instance to hold the randomly generated x,y positions
 
-    bool flag = true;
+    bool flag = true;   // flag to check for whether a random generation is valid
 
     while(foodBucket->getSize() < 5)
     {
@@ -68,26 +45,28 @@ void Food::generateFood(const objPosArrayList* blockOffList) {
 
         for(int i = 0; i < blockOffList->getSize(); i++)
         {
-            if(random.pos->x == blockOffList->getElement(i).pos->x || x_vector[random.pos->x] != 0 || random.pos->x == 0 || random.pos->y == blockOffList->getElement(i).pos->y || y_vector[random.pos->y] != 0 || random.pos->y == 0)
+            // Checking if random overlaps with snakebody, was previously used, or lies on the game border
+            if(blockOffList->getElement(i).isPosEqual(&random) || x_vector[random.pos->x] != 0 || random.pos->x == 0 || y_vector[random.pos->y] != 0 || random.pos->y == 0) 
             {
-                flag = false;
+                flag = false; // random generation is invalid
                 break;
             }
         }
 
-        if(!flag)
+        if(!flag)  // If invalid, continue to next iteration
         {
             continue;
         }
-        else if(flag && foodBucket->getSize() < 3)
+        else if(flag && foodBucket->getSize() < 3)  // First 3 elements of foodBucket will have 'o' symbol
         {
             random.symbol = 'o'; // Regular Food
             foodBucket->insertTail(random);
 
-            x_vector[random.pos->x]++;
+            // Marking x & y as "used" in the bit vector
+            x_vector[random.pos->x]++; 
             y_vector[random.pos->y]++;
         }
-        else if(flag && foodBucket->getSize() < 4)
+        else if(flag && foodBucket->getSize() < 4)  // Fourth element of foodBucket with have '+' symbol 
         {
             random.symbol = '+'; // Special Food ('good' one)
             foodBucket->insertTail(random);
@@ -95,7 +74,7 @@ void Food::generateFood(const objPosArrayList* blockOffList) {
             x_vector[random.pos->x]++;
             y_vector[random.pos->y]++;
         }
-        else if(flag && foodBucket->getSize() < 5)
+        else if(flag && foodBucket->getSize() < 5)   // Fifth element of foodBucket with have '-' symbol 
         {
             random.symbol = '-'; // Special Food ('bad' one)
             foodBucket->insertTail(random);
@@ -105,60 +84,6 @@ void Food::generateFood(const objPosArrayList* blockOffList) {
         }
     }
 
-    // flag = true;
-     
-    // while(listSize < 4)
-    // {
-        
-    //     random.pos->x = rand() % (boardSizeX - 1);
-    //     random.pos->y = rand() % (boardSizeY - 1);
-        
-    //     for(int i = 0; i < blockOffList->getSize(); i++)
-    //     {
-    //         if(random.pos->x == blockOffList->getElement(i).pos->x || x_vector[random.pos->x] != 0 || random.pos->x == 0 || random.pos->y == blockOffList->getElement(i).pos->y || y_vector[random.pos->y] != 0 || random.pos->y == 0)
-    //         {
-    //             flag = false;
-    //         }
-    //     }
-
-    //     if(flag)
-    //     {
-    //         random.symbol = '-'; // Bad Food
-    //         foodBucket->insertTail(random);
-    //         x_vector[random.pos->x]++;
-    //         y_vector[random.pos->y]++;
-    //         listSize++;
-    //     }
-
-    // }
-
-    // flag = true;
-
-    // while(listSize < 5)
-    // {
-        
-    //     random.pos->x = rand() % (boardSizeX - 1);
-    //     random.pos->y = rand() % (boardSizeY - 1);
-        
-    //     for(int i = 0; i < blockOffList->getSize(); i++)
-    //     {
-    //         if(random.pos->x == blockOffList->getElement(i).pos->x || x_vector[random.pos->x] != 0 || random.pos->x == 0 || random.pos->y == blockOffList->getElement(i).pos->y || y_vector[random.pos->y] != 0 || random.pos->y == 0)
-    //         {
-    //             flag = false;
-    //         }
-    //     }
-
-    //     if(flag)
-    //     {
-    //         random.symbol = '+'; // Special Food
-    //         foodBucket->insertTail(random);
-    //         x_vector[random.pos->x]++;
-    //         y_vector[random.pos->y]++;
-    //         listSize++;
-    //     }
-
-    // }
-
 }
 
 objPosArrayList* Food::getFoodPos() const 
@@ -166,14 +91,10 @@ objPosArrayList* Food::getFoodPos() const
     return foodBucket;
 }
 
-// objPos Food::getFoodPosElement(int index) const
-// {
-//     return foodBucket->getElement(index);
-// }
-
 void Food::clearFood()
 {
-    for(int i = 1; i < foodBucket->getSize(); i++)
+    // Setting size of foodBucket to 0 
+    while(foodBucket->getSize() > 0)  
     {
         foodBucket->removeTail();
     }

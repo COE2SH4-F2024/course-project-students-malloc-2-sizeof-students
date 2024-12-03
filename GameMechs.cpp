@@ -6,10 +6,7 @@ GameMechs *myGM;
 
 GameMechs::GameMechs()
 {
-    // : input('\0'), exitFlag(false), loseFlag(false), score(0), boardSizeX(30), boardSizeY(15), food() {
     // Default constructor: initialize all members
-    // No need for additional code in the constructor body unless needed
-
     boardSizeX = 30;
     boardSizeY = 15;
     score = 0;
@@ -17,29 +14,23 @@ GameMechs::GameMechs()
     loseFlag = false;
     input = '\0';
 
-    //food.setObjPos(-10, -10, 'o');
 }
 
 GameMechs::GameMechs(int boardX, int boardY)
 {
-    // : input('\0'), exitFlag(false), loseFlag(false), score(0), boardSizeX(boardX), boardSizeY(boardY), food() {
     // Parameterized constructor: initialize with custom board size
-    // No need for additional code in the constructor body unless needed
-
     boardSizeX = boardX;
     boardSizeY = boardY;
     exitFlag = false;
     loseFlag = false;
     score = 0;
     input = '\0';
-
-    //food.setObjPos(-10, -10, 'o');
 }
 
 // do you need a destructor?
 GameMechs::~GameMechs()
 {
-    // no dynamic memory to clean up right now...
+    // no dynamic memory to clean up
 }
 
 bool GameMechs::getExitFlagStatus() const
@@ -53,7 +44,7 @@ bool GameMechs::getLoseFlagStatus() const
 }
     
 
-char GameMechs::getInput() 
+char GameMechs::getInput() const
 {
     return input;
 }
@@ -65,7 +56,7 @@ int GameMechs::getScore() const
 
 void GameMechs::incrementScore(int val)
 {
-    score += val;
+    score += val;  // increments score by the value inputted
 }
 
 int GameMechs::getBoardSizeX() const
@@ -103,11 +94,13 @@ void GameMechs::clearInput()
 
 void GameMechs::collectAsynchInput()
 {
+    // Checks if there is an input. If yes, stores it in variable input
     if(MacUILib_hasChar())
     {
         input = MacUILib_getChar();
     }
 
+    // Exit key is space bar
     if(input == ' ')
     {
         exitFlag = true;

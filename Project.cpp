@@ -25,9 +25,7 @@ void CleanUp(void);
 
 int main(void)
 {
-    printf("I am before init");
     Initialize();
-    printf("I am at init");
 
     while(mainGameMechsRef->getExitFlagStatus() == false)  
     {
@@ -62,6 +60,7 @@ void GetInput(void)
 
 void RunLogic(void)
 {
+    srand(time(NULL));
     myPlayer->movePlayer();
     mainGameMechsRef->clearInput();
 }
@@ -72,23 +71,22 @@ void DrawScreen(void)
     objPosArrayList* playerPos = myPlayer->getPlayerPos();
     objPosArrayList* foodPos = myFood->getFoodPos();
     int playerSize = playerPos->getSize();
-    int foodSize = myFood->getFoodPos()->getSize();
     
     int boardX = mainGameMechsRef->getBoardSizeX();
     int boardY = mainGameMechsRef->getBoardSizeY();
-    // objPos player_pos = myPlayer->getPlayerPos()->getHeadElement(); // ALSO FIX
-    //objPos foodPos = myFood->getFoodPos()->;
+
     bool playerFlag = false;
     bool foodFlag = false;
     
     int i,j;
+    // iterates through game board dimensions. 
     for(i = 0; i < boardY; i++)
     {
         for(j = 0; j < boardX; j++)
         {
             playerFlag = false;
             foodFlag = false;
-            
+            // iterates through snakes size and prints the player/snake
             for(int k = 0; k < playerSize; k++)
             {
                 if(playerPos->getElement(k).pos->x == j && playerPos->getElement(k).pos->y == i)
@@ -98,13 +96,14 @@ void DrawScreen(void)
                     break;
                 }
             }
-
+            // checks if playerFlag is true (set to true when it printed the snake)
             if(playerFlag)
             {
                 continue;
             }
 
-            for(int x = 0; x < foodSize; x++)
+            // iterates through items in food bucket
+            for(int x = 0; x < myFood->getFoodPos()->getSize(); x++)
             {
                 if(foodPos->getElement(x).pos->x == j && foodPos->getElement(x).pos->y == i)
                 {
@@ -114,11 +113,12 @@ void DrawScreen(void)
                 }
             }
 
-            if(foodFlag)
+            if(foodFlag) // checks if foodFlag is true (set to true when it prints an item from food bucket)
             {
                 continue;
             }
-
+            
+            // prints border and empty space (' ')
             if(i == 0 || i == boardY - 1 || j == 0 || j == boardX - 1)
             {
                 MacUILib_printf("#");
@@ -133,11 +133,15 @@ void DrawScreen(void)
         MacUILib_printf("\n");
     }  
 
+    
+    // instructions and players information displayed
     MacUILib_printf("\nScore: %d\n", mainGameMechsRef->getScore());
     MacUILib_printf("Snake Size: %d\n", myPlayer->getPlayerPos()->getSize());
-    MacUILib_printf("\nThe 'o' symbol is normal food\n");
+    MacUILib_printf("\nGame Instructions:\n");
+    MacUILib_printf("The 'o' symbol is normal food\n");
     MacUILib_printf("The '+' symbol is GOOD: it increases your score by however long your snake is, then reduces your snake size to 1\n");
-    MacUILib_printf("The '-' symbol is BAD: it doubles the size of your snake and gives you no points\n");
+    MacUILib_printf("The '-' symbol is BAD: it kills you. AVOID AT ALL COSTS!!!!!\n");
+    MacUILib_printf("\nPress SPACE bar to exit the game.\n");
 }
 
 void LoopDelay(void)
@@ -147,19 +151,15 @@ void LoopDelay(void)
 
 
 void CleanUp(void)
-{
-    //MacUILib_clearScreen();  
-    
+{  
     if(mainGameMechsRef->getLoseFlagStatus())
     {
-        MacUILib_printf("\nYou lost the game :(\n");
+        MacUILib_printf("\nYou LOST the game :(\n");
     }
     else if(!(mainGameMechsRef->getLoseFlagStatus()))
     {
         MacUILib_printf("\nGame ended by Player.\n");
     }
-
-    //MacUILib_printf("Score: %d", mainGameMechsRef->getScore());
 
     MacUILib_uninit();
 

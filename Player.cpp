@@ -10,10 +10,8 @@ Player::Player(GameMechs* thisGMRef, Food* thisFoodRef)
     foodRef = thisFoodRef;
     myDir = STOP;
 
-    // more actions to be included
-
-    playerPosList = new objPosArrayList();
-    objPos headPos((mainGameMechsRef->getBoardSizeX())/2, (mainGameMechsRef->getBoardSizeY())/2, '@');
+    playerPosList = new objPosArrayList();  // Instantiating playerPosList on heap
+    objPos headPos((mainGameMechsRef->getBoardSizeX())/2, (mainGameMechsRef->getBoardSizeY())/2, '@');  // Starting position of player
     
     playerPosList->insertHead(headPos);
 }
@@ -21,7 +19,7 @@ Player::Player(GameMechs* thisGMRef, Food* thisFoodRef)
 
 Player::~Player()
 {
-    // delete any heap members here
+    // deleting playerPosList from heap
     delete playerPosList;
 }
 
@@ -75,8 +73,10 @@ void Player::movePlayer()
     // PPA3 Finite State Machine logic
     updatePlayerDir();
 
+    // make tmpPos equal to the head element
     objPos tmpPos(playerPosList->getHeadElement().pos->x, playerPosList->getHeadElement().pos->y, playerPosList->getHeadElement().symbol);
 
+    // Update tmpPos to where the snake is moving based on myDir status
     switch(myDir)
     {
         case LEFT:
@@ -111,7 +111,7 @@ void Player::movePlayer()
             break;
     }
     
-    playerPosList->insertHead(tmpPos);
+    playerPosList->insertHead(tmpPos); // make tmpPos the new head
 
     increasePlayerLength();
     checkSelfCollision();
@@ -120,60 +120,67 @@ void Player::movePlayer()
 
 // More methods to be added
 
-bool Player::checkFoodConsumption()
+bool Player::checkFoodConsumption()  // check if player has consumed the food
 {
     int foodSize = foodRef->getFoodPos()->getSize();
-    int playerSize = playerPosList->getSize();
+    int playerSize = playerPosList->getSize(); //get player size
 
-
-    
-    for(int i = 0; i < foodSize; i++) 
-
-        if(playerPosList->getHeadElement().pos->x == foodRef->getFoodPos()->getElement(i).pos->x && playerPosList->getHeadElement().pos->y == foodRef->getFoodPos()->getElement(i).pos->y)
+    //for loop to iterate through elements within food bucket
+    for(int i = 0; i < foodSize; i++)
+    {
+        objPos my_player = playerPosList->getHeadElement();
+        char foodSymbol = foodRef->getFoodPos()->getElement(i).getSymbolIfPosEqual(&my_player);  // gets food symbol based on collision.  
+        
+        if(foodSymbol == 0)
         {
-            char foodSymbol = foodRef->getFoodPos()->getElement(i).symbol;
-
-            if(foodSymbol == '+')
-            {
-                mainGameMechsRef->incrementScore(playerSize - 1);            // Increment score by the size of the snake body
-                playerPosList->setSizeto1();                             // Set snake body size to 1
-            }
-            else if(foodSymbol == '-')
-            {
-                while(playerPosList->getSize() < 2 * (playerSize - 1))                       // double size of the snake body
-                {
-                    playerPosList->insertTail(playerPosList->getTailElement());
-                }
-
-            }
-            else 
-            {
-                mainGameMechsRef->incrementScore(1);                     // for normal food symbol 'o', increment score by 1
-            }
-            
-            foodRef->generateFood(playerPosList);
+            continue;
+        }
+        if(foodSymbol == 'o') 
+        {
+            mainGameMechsRef->incrementScore(1); // normal food, increments score by 1
+            foodRef->generateFood(playerPosList); // add to tail by 1
             return true;
         }
+        else if(foodSymbol == '+')
+        {
+            mainGameMechsRef->incrementScore(playerSize - 1);                       // Increment score by the size of the snake body
+            while (playerPosList->getSize() > 1)
+            {
+                playerPosList->removeTail();
+            }
+            foodRef->generateFood(playerPosList);                                   // Set snake body size to 1
+            return true;
+        }
+        else if(foodSymbol == '-')                                                  // This food symbol causes SNAKE DEATH and exits
+        {
+            playerPosList->removeTail(); 
+            mainGameMechsRef->setLoseFlag();
+            mainGameMechsRef->setExitTrue();
+            return true;
+        }
+    }
 
     return false;
 }
 
 void Player::increasePlayerLength()
 {
-    if(!checkFoodConsumption())
+    if(!checkFoodConsumption())  // if food isnt consumed, player length does not increase 
     {
         playerPosList->removeTail();
     }
 }
 
 
-void Player::checkSelfCollision() // changed from bool - check if okay
+void Player::checkSelfCollision()
 {
     // Check for Self collision
     int listSize = playerPosList->getSize();
+    //for loop iterates through size of snake
     for(int i = 1; i < listSize; i++)
     {
-        if(playerPosList->getHeadElement().pos->x == playerPosList->getElement(i).pos->x && playerPosList->getHeadElement().pos->y == playerPosList->getElement(i).pos->y)
+        objPos my_player = playerPosList->getHeadElement(); 
+        if(playerPosList->getElement(i).isPosEqual(&my_player))   // if player collides with their tail, exit
         {
             mainGameMechsRef->setLoseFlag();
             mainGameMechsRef->setExitTrue();

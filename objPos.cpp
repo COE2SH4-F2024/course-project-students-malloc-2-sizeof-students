@@ -51,10 +51,6 @@ objPos& objPos::operator= (const objPos &o)
     return *this;
 }
 
-
-
-
-
 void objPos::setObjPos(objPos o)
 {
     pos->x = o.pos->x;
